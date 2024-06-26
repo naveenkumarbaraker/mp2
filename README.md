@@ -2,32 +2,48 @@
 
 ## 1 – Creating the t2.micro Instances
 Log into the AWS Management Console at https://console.aws.amazon.com/. On the Console Home page, click the Services button at the top to access the pull-down menu.
-
+<p align="center">
+  <img src="https://gateway.pinata.cloud/ipfs/QmR2ebUzUHEo1d8oSbnso7g6Gw1JAWu1dxrZCHWdketb5h" width="500" >
+</p>
 Select Services -> Compute -> EC2 to open the EC2 Dashboard. From here, you can find lists of resources and a button for launching an instance.
+<p align="center">
+  <img src="https://gateway.pinata.cloud/ipfs/Qma8uKvGFR2qp9hCmvnFnTCaP68q8fChQcWfKXnxBq9en3" width="500" >
+</p>
 
 In the Name and tags section on the Launch an instance page, name the new instance "Worker".
+
 <p align="center">
-  <img src="https://gateway.pinata.cloud/ipfs/QmRvT2XRKgNGFQq24krGao1W9HoBrn48coDJG6dsvXfuV5" width="500" >
+  <img src="https://gateway.pinata.cloud/ipfs/QmVh7TVNdtWiEmzdARsUtYQvYSA7pYXnmL1dTgqmAjeDnr" width="500" >
 </p>
 
 In the Application and OS Images section, choose an Amazon Machine Image (AMI). In the Instance type section, select the default t2.micro instance, which is free tier eligible.
 
 In the Key pair (login) section, click the Create new key pair button to specify a key pair for SSH communication. Amazon EC2 stores the public key, and you must store the private key securely.
 Click Create new key pair, name it hadoopkey, select RSA type and .ppk format, then click Create key pair. The hadoopkey.ppk file will download automatically.
+<p align="center">
+  <img src="https://gateway.pinata.cloud/ipfs/QmTfXsCD82RAh68DVLz61sV9vZZmxrYucbxcu2KPz2tcNM" width="500" >
+</p>
 
-Use the default settings in Network settings and Configure storage. In the Summary section, enter 4 for the Number of instances.
+Use the default settings in Network settings and Configure storage for the Number of instances and click Launch instance to create four instances. A confirmation will show their successful creation.
+<p align="center">
+  <img src="https://gateway.pinata.cloud/ipfs/QmRvT2XRKgNGFQq24krGao1W9HoBrn48coDJG6dsvXfuV5" width="500" >
+</p>
 
-Click Launch instance to create four instances. A confirmation will show their successful creation.
 
 ## 2 – Configure Security Group
 ### 2.1 Access the Inbound Rules: 
 Select the master node in the instance list to view configurations. This allows access to modify the security group settings, ensuring all instances share the same rules.
+<p align="center">
+  <img src="https://gateway.pinata.cloud/ipfs/QmNW3BP86kQVZwERqXVwXiYZKKVv9CfGGWdTNhzJr8RCtL" width="500" >
+</p>
 
 ### 2.2 Open Port 9870 to the Web Interface:
-Clic Edit inbound rules, then Add rule to open port 9870 for the web interface. 
+Clic Edit inbound rules, then Add rule to open port 9870 for the web interface, Add a new inbound rule allowing ports 0-64000 for the same security group as configured. This ensures comprehensive cluster security without exposing unnecessary access points.
 
-### 2.3 Open All Ports Only for the Same Security Group:
-Add a new inbound rule allowing ports 0-64000 for the same security group as configured. This ensures comprehensive cluster security without exposing unnecessary access points.
+<p align="center">
+  <img src="https://gateway.pinata.cloud/ipfs/QmfKXdXsLodFUDG9zehNUEXuxhqo7FwD711KuN4wMTUQZ8" width="500" >
+</p>
+
 Click on the Save Rules button to accept all the changes.
 
 ## 3 – Installing Hadoop on the Master Node
@@ -44,7 +60,7 @@ sudo yum install java-1.8.0-devel
 ### 3.3 Hadoop Installation
 Deploying Hadoop on a multi-node cluster starts with downloading and installing Hadoop on the master instance, followed by configuring it for your setup and requirements.
 
-### 3.4.1 Hadoop 3.3.6 Installation
+#### 3.4.1 Hadoop 3.3.6 Installation
 We run the following command to download the Hadoop 3.3.6 installation package to the master node
 ```
 wget https://dlcdn.apache.org/hadoop/common/hadoop-3.3.6/hadoop-3.3.6.tar.gz
@@ -74,8 +90,7 @@ $ nano hadoop-3.3.6/etc/hadoop/hadoop-env.sh
 ```
 After finding the line "# export JAVA_HOME=" in the editor, we add the configuration line below the original line, as shown in Figure 21. We can hit Ctrl + O, then the Entry key to save the changes. Next, we hit Ctrl + x to exit the editor.
 
-Figure 21 Set the JAVA_HOME configuration in the conf/hadoop-env.sh file.
-Figure 21 Set the JAVA_HOME configuration in the conf/hadoop-env.sh file.
+
 
 ### 3.4.3 Environment Settings
 
