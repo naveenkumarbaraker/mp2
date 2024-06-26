@@ -223,7 +223,7 @@ We use the private IP address of the master node in this configure file:
 ```
 ### 3.4.8 The workers File
 
-We should list all worker hostnames or IP addresses in the etc/hadoop/workers file, one per line. Therefore, the last step is to edit the file and add the private IP addresses of the three worker nodes to the file.
+We should list all worker hostnames or IP addresses in the etc/hadoop/workers file, one per line. Therefore, the last step is to edit the file and add the private IP addresses of the 2 worker nodes to the file.
 ```
 $ nano hadoop-3.3.6/etc/hadoop/workers
 ```
@@ -233,14 +233,14 @@ By default, the file only contains one hostname: localhost. We remove the defaul
 172.31.33.70
 172.31.34.132
 ## 4 – Setting Up SSH Passwordless Login
-After configuring the master node, we must copy the Hadoop installation on the master node to the three worker nodes. The SSH (Secure Shell) protocol can provide secure access for automated processes. We use this protocol to enable multiple computers to communicate. We generate and store the public key on the master node. We then copy the public key to the worker nodes to achieve passwordless SSH access across the cluster.
+After configuring the master node, we must copy the Hadoop installation on the master node to the two worker nodes. The SSH (Secure Shell) protocol can provide secure access for automated processes. We use this protocol to enable multiple computers to communicate. We generate and store the public key on the master node. We then copy the public key to the worker nodes to achieve passwordless SSH access across the cluster.
 
 ### 4.1 Generate a Pair of Public Key and Private Key on the Master Node
 Run the following command on the master node to generate a key pair:
 ```
 $ ssh-keygen -t rsa
 ```
-The command prompts us for a file name and passphrase. We hit the Enter key to accept the default. We should know that adding a passphrase is essential for securing the private key (Smith, 2023). Since we want to create an environment for studying, we enter an empty value for the passphrase.
+The command prompts us for a file name and passphrase. We hit the Enter key to accept the default. We should know that adding a passphrase is essential for securing the private key . Since we want to create an environment for studying, we enter an empty value for the passphrase.
 ```
 Enter file in which to save the key (/home/ec2-user/.ssh/id_rsa):
 Enter passphrase (empty for no passphrase):
@@ -284,14 +284,14 @@ $ ssh 172.31.33.70
 $ ssh 172.31.34.132
 ```
 ## 5 – Setting Up the Worker Nodes
-After setting up Hadoop on the master node, we copy the settings to the three worker nodes. First, we pack up the hadoop-3.3.6 folder on the master node. We then copy the package to the worker nodes. Next, we access each worker node, unpack the package, and install Java.
+After setting up Hadoop on the master node, we copy the settings to the two worker nodes. First, we pack up the hadoop-3.3.6 folder on the master node. We then copy the package to the worker nodes. Next, we access each worker node, unpack the package, and install Java.
 
 ### 5.1 Creating a Hadoop Installation Package and Copy it to All Worker Nodes
 Assuming we are in the root home directory, i.e., /home/ec2-user/. If not, we can run the cd command to change the current directory to the root directory. We then run the following command to pack up the entire hadoop-3.3.6 folder into a single file:
 ```
 $ tar cvf Hadoop_Master.tar hadoop-3.3.6
 ```
-Next, we run the following three commands to copy the file to the three worker nodes:
+Next, we run the following two commands to copy the file to the two  worker nodes:
 ```
 $ scp Hadoop_Master.tar ec2-user@172.31.34.82:/home/ec2-user/Hadoop_Master.tar 
 $ scp Hadoop_Master.tar ec2-user@172.31.33.70:/home/ec2-user/Hadoop_Master.tar 
@@ -308,7 +308,7 @@ $ tar xvf Hadoop_Master.tar
 $ sudo yum install java-1.8.0
 $ sudo yum install java-1.8.0-devel
 ```
-After completing the setting on one node, we run the exit command to exit the node. We then repeat these steps on the other two nodes. Here are all the commands to complete setting up the other two nodes:
+After completing the setting on one node, we run the exit command to exit the node. We then repeat these steps on the other node. Here are all the commands to complete setting up the other node:
 ```
 $ ssh 172.31.33.70
 $ tar xvf Hadoop_Master.tar
@@ -322,10 +322,9 @@ $ sudo yum install java-1.8.0-devel
 $ exit
 ```
 ## 6 – Running the Hadoop MapReduce Example on the Cluster
-We start the Hadoop cluster and then run an example the Hadoop framework provides. The example is a simple MapReduce application that counts the number of occurrences of each word in a file.
 
 ### 6.1 Hadoop Startup
-When using it for the first time, we must format Hadoop's distributed filesystem (HDFS) via the NameNode (Noll, 2011). Here is the command to format the new distributed file system:
+When using it for the first time, we must format Hadoop's distributed filesystem (HDFS) via the NameNode . Here is the command to format the new distributed file system:
 ```
 $ hdfs namenode -format
 ```
@@ -341,7 +340,7 @@ $ start-yarn.sh
 ```
 We use the jps command to verify that all processes start correctly.
 
-We can also use the following command to verify that all three worker nodes started successfully:
+We can also use the following command to verify that all two worker nodes started successfully:
 ```
 $ hdfs fsck / -files -blocks
 ```
@@ -641,3 +640,4 @@ Reducer: KMeansReducer
 
 Run and Get the results:
 Check the output in the intermediate_output file.
+
