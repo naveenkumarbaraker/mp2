@@ -295,7 +295,6 @@ Next, we run the following two commands to copy the file to the two  worker node
 ```
 $ scp Hadoop_Master.tar ec2-user@172.31.34.82:/home/ec2-user/Hadoop_Master.tar 
 $ scp Hadoop_Master.tar ec2-user@172.31.33.70:/home/ec2-user/Hadoop_Master.tar 
-$ scp Hadoop_Master.tar ec2-user@172.31.34.132:/home/ec2-user/Hadoop_Master.tar
 ```
 ### 5.2 Unpacking the Hadoop Installation Package and Installing Java on Each Worker Node
 We first use the ssh command to access worker 1 node:
@@ -311,11 +310,6 @@ $ sudo yum install java-1.8.0-devel
 After completing the setting on one node, we run the exit command to exit the node. We then repeat these steps on the other node. Here are all the commands to complete setting up the other node:
 ```
 $ ssh 172.31.33.70
-$ tar xvf Hadoop_Master.tar
-$ sudo yum install java-1.8.0
-$ sudo yum install java-1.8.0-devel
-$ exit
-$ ssh 172.31.34.132
 $ tar xvf Hadoop_Master.tar
 $ sudo yum install java-1.8.0
 $ sudo yum install java-1.8.0-devel
@@ -364,11 +358,11 @@ $ hdfs dfs -put  Dataclustering/localfiles/
 ```
 Finally, we run the Firefly_kmeans file:
 ```
-$ time hadoop jar hadoop-3.3.6/share/hadoop/mapreduce/hadoop-mapreduce-examples-3.3.6.jar wordcount /data/MSSQLTips /data/firefly_kmeans
+$ time hadoop jar hadoop-3.3.6/share/hadoop/mapreduce/hadoop-mapreduce-examples-3.3.6.jar firefly_kmeans/localfiles/firefly_kmeans
 ```
 We can use this command to view the output:
 ```
-$ hadoop fs -cat /data/firefly_kmeans/part-r-00000 | more
+$ hadoop fs -cat /localfiles/firefly_kmeans/part-r-00000 | more
 ```
 ### 6.3 Hadoop Shutdown
 We use this utility script to stop all the HDFS processes:
