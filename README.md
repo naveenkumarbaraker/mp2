@@ -635,12 +635,6 @@ Reducer: KMeansReducer
 Run and Get the results:
 Check the output in the intermediate_output file.
 
-![](https://github.com/naveenkumarbaraker/mp2/edit/main/1.jpeg)
-![](https://github.com/naveenkumarbaraker/mp2/edit/main/2.jpeg)
-![](https://github.com/naveenkumarbaraker/mp2/edit/main/3.jpeg)
-![](https://github.com/naveenkumarbaraker/mp2/edit/main/4.jpeg)
-![](https://github.com/naveenkumarbaraker/mp2/edit/main/5.jpeg)
-![](https://github.com/naveenkumarbaraker/mp2/edit/main/6.jpeg)
-![](https://github.com/naveenkumarbaraker/mp2/edit/main/7.jpeg)
-![](https://github.com/naveenkumarbaraker/mp2/edit/main/8.jpeg)
+![](https://github.com/naveenkumarbaraker/mp2/blob/main/1.jpeg)
+
 
