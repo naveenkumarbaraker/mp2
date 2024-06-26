@@ -344,7 +344,7 @@ http://public IP address:9870
 When switching to the Datanode tab, we find a list of worker nodes in the cluster.
 
 ### 6.2 Running a MapReduce Example on the Cluster
-We copy text from the web page https://www.mssqltips.com/about/ to the nano text editor. Then, we save the text file on the master node. Here is the command we used:
+
 ```
 $ nano Dataclustering
 ```
