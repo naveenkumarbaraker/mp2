@@ -603,6 +603,9 @@ Reducer: KMeansReducer
 
 Run and Get the results:
 Check the output in the intermediate_output file.
+![](https://github.com/naveenkumarbaraker/mp2/blob/main/8.jpeg)
+![](https://github.com/naveenkumarbaraker/mp2/blob/main/7.jpeg)
+
 
 ### Steps in running the code with 4-Nodes:
 #### Set Up AWS EMR Cluster:
@@ -615,6 +618,8 @@ hadoop jar FireflyKMeans.jar FireflyKMeans/KMeans_firefly/input bucket/intermedi
 Upload Data and Code:
 Upload the Dataset
 Upload JAR file to intermediate_output.
+![](https://github.com/naveenkumarbaraker/mp2/blob/main/2.jpeg)
+![](https://github.com/naveenkumarbaraker/mp2/blob/main/3.jpeg)
 
 #### Run Hadoop Jobs:
 SSH into the master node.
@@ -635,14 +640,9 @@ Reducer: KMeansReducer
 Run and Get the results:
 Check the output in the intermediate_output file.
 
-![](https://github.com/naveenkumarbaraker/mp2/blob/main/1.jpeg)
-![](https://github.com/naveenkumarbaraker/mp2/blob/main/2.jpeg)
-![](https://github.com/naveenkumarbaraker/mp2/blob/main/3.jpeg)
-![](https://github.com/naveenkumarbaraker/mp2/blob/main/4.jpeg)
-![](https://github.com/naveenkumarbaraker/mp2/blob/main/5.jpeg)
+
 ![](https://github.com/naveenkumarbaraker/mp2/blob/main/6.jpeg)
-![](https://github.com/naveenkumarbaraker/mp2/blob/main/7.jpeg)
-![](https://github.com/naveenkumarbaraker/mp2/blob/main/8.jpeg)
+![](https://github.com/naveenkumarbaraker/mp2/blob/main/5.jpeg)
 
 
 
