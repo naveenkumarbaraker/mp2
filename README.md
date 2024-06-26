@@ -44,7 +44,7 @@ sudo yum install java-1.8.0-devel
 ### 3.3 Hadoop Installation
 Deploying Hadoop on a multi-node cluster starts with downloading and installing Hadoop on the master instance, followed by configuring it for your setup and requirements.
 
-#### 3.4.1 Hadoop 3.3.6 Installation
+### 3.4.1 Hadoop 3.3.6 Installation
 We run the following command to download the Hadoop 3.3.6 installation package to the master node
 ```
 wget https://dlcdn.apache.org/hadoop/common/hadoop-3.3.6/hadoop-3.3.6.tar.gz
@@ -365,3 +365,264 @@ Then, we use the following utility script to stop all the YARN processes:
 ```
 $ stop-yarn.sh
 ```
+
+
+## Firefly-Kmeans Implementation: Firefly_Kmeans.java
+```
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.Mapper;
+import org.apache.hadoop.mapreduce.Reducer;
+import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
+import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+
+public class FireflyKMeans {
+    public static class DataPoint {
+        double[] features;
+
+        DataPoint(String[] values) {
+            features = new double[values.length];
+            for (int i = 0; i < values.length; i++) {
+                features[i] = Double.parseDouble(values[i]);
+            }
+        }
+
+        public double distance(DataPoint other) {
+            double sum = 0;
+            for (int i = 0; i < features.length; i++) {
+                sum += Math.pow(features[i] - other.features[i], 2);
+            }
+            return Math.sqrt(sum);
+        }
+    }
+
+    public static class FireflyMapper extends Mapper<Object, Text, IntWritable, Text> {
+        private List<DataPoint> initialPopulation = new ArrayList<>();
+        private int populationSize = 10; // Adjust as necessary
+
+        @Override
+        protected void setup(Context context) throws IOException, InterruptedException {
+            // Initialize random population
+            for (int i = 0; i < populationSize; i++) {
+                initialPopulation.add(generateRandomDataPoint());
+            }
+        }
+
+        private DataPoint generateRandomDataPoint() {
+            Random random = new Random();
+            double[] features = new double[10]; 
+            for (int i = 0; i < features.length; i++) {
+                features[i] = random.nextDouble(); 
+            }
+            return new DataPoint(features);
+        }
+
+        public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
+            String[] fields = value.toString().split(",");
+            DataPoint dataPoint = new DataPoint(fields);
+            DataPoint bestFirefly = null;
+            double bestIntensity = Double.MAX_VALUE;
+
+            for (DataPoint firefly : initialPopulation) {
+                double intensity = dataPoint.distance(firefly);
+                if (intensity < bestIntensity) {
+                    bestIntensity = intensity;
+                    bestFirefly = firefly;
+                }
+            }
+
+            context.write(new IntWritable(1), new Text(bestFirefly.toString()));
+        }
+    }
+
+    public static class FireflyReducer extends Reducer<IntWritable, Text, IntWritable, Text> {
+        public void reduce(IntWritable key, Iterable<Text> values, Context context) throws IOException, InterruptedException {
+            for (Text value : values) {
+                context.write(key, value); 
+            }
+        }
+    }
+
+    public static class KMeansMapper extends Mapper<Object, Text, IntWritable, Text> {
+        private List<DataPoint> centroids = new ArrayList<>();
+        private int k = 5;
+
+        @Override
+        protected void setup(Context context) throws IOException, InterruptedException {
+                      for (int i = 0; i < k; i++) {
+                centroids.add(generateRandomDataPoint());
+            }
+        }
+
+        private DataPoint generateRandomDataPoint() {
+            Random random = new Random();
+            double[] features = new double[10]; 
+            for (int i = 0; i < features.length; i++) {
+                features[i] = random.nextDouble(); 
+            }
+            return new DataPoint(features);
+        }
+
+        public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
+            String[] fields = value.toString().split(",");
+            DataPoint dataPoint = new DataPoint(fields);
+            DataPoint nearestCentroid = null;
+            double nearestDistance = Double.MAX_VALUE;
+
+            for (int i = 0; i < centroids.size(); i++) {
+                double distance = dataPoint.distance(centroids.get(i));
+                if (distance < nearestDistance) {
+                    nearestDistance = distance;
+                    nearestCentroid = centroids.get(i);
+                }
+            }
+
+            context.write(new IntWritable(centroids.indexOf(nearestCentroid)), value);
+        }
+    }
+
+    public static class KMeansReducer extends Reducer<IntWritable, Text, IntWritable, Text> {
+        public void reduce(IntWritable key, Iterable<Text> values, Context context) throws IOException, InterruptedException {
+            for (Text value : values) {
+                context.write(key, value); 
+            }
+        }
+    }
+
+    public static void main(String[] args) throws Exception {
+        Configuration conf = new Configuration();
+
+        Job job1 = Job.getInstance(conf, "firefly algorithm");
+        job1.setJarByClass(FireflyKMeans.class);
+        job1.setMapperClass(FireflyMapper.class);
+        job1.setReducerClass(FireflyReducer.class);
+        job1.setOutputKeyClass(IntWritable.class);
+        job1.setOutputValueClass(Text.class);
+        FileInputFormat.addInputPath(job1, new Path(args[0]));
+        FileOutputFormat.setOutputPath(job1, new Path(args[1]));
+        job1.waitForCompletion(true);
+
+        Job job2 = Job.getInstance(conf, "kmeans clustering");
+        job2.setJarByClass(FireflyKMeans.class);
+        job2.setMapperClass(KMeansMapper.class);
+        job2.setReducerClass(KMeansReducer.class);
+        job2.setOutputKeyClass(IntWritable.class);
+        job2.setOutputValueClass(Text.class);
+        FileInputFormat.addInputPath(job2, new Path(args[1]));
+        FileOutputFormat.setOutputPath(job2, new Path(args[2]));
+        System.exit(job2.waitForCompletion(true) ? 0 : 1);
+
+        int populationSize = 10;
+        int k = 5;
+        int d = 10;
+
+        long job1Complexity = TimeComplexityCalculator.calculateJob1TimeComplexity(populationSize, d);
+        long job2Complexity = TimeComplexityCalculator.calculateJob2TimeComplexity(k, d);
+
+        System.out.println("Estimated time complexity for Job 1: O(" + job1Complexity + ")");
+        System.out.println("Estimated time complexity for Job 2: O(" + job2Complexity + ")");
+    }
+
+    public static class DataPoint {
+        double[] features;
+
+        DataPoint(String[] values) {
+            features = new double[values.length];
+            for (int i = 0; i < values.length; i++) {
+                features[i] = Double.parseDouble(values[i]);
+            }
+        }
+
+        public double distance(DataPoint other) {
+            double sum = 0;
+            for (int i = 0; i < features.length; i++) {
+                sum += Math.pow(features[i] - other.features[i], 2);
+            }
+            return Math.sqrt(sum);
+        }
+
+        @Override
+        public String toString() {
+            StringBuilder sb = new StringBuilder();
+            sb.append("(");
+            for (int i = 0; i < features.length; i++) {
+                sb.append(features[i]);
+                if (i < features.length - 1) {
+                    sb.append(", ");
+                }
+            }
+            sb.append(")");
+            return sb.toString();
+        }
+    }
+}
+```
+### Steps in running the code with 2-Nodes:
+#### Set Up AWS EMR Cluster:
+Create an EMR cluster with 2 nodes.
+
+#### Converting the Java code into .jar file:
+```
+hadoop jar FireflyKMeans.jar FireflyKMeans/KMeans_firefly/input bucket/intermediate_output
+```
+
+#### Upload Data and Code:
+Upload the Dataset
+Upload JAR file to intermediate_output.
+
+#### Run Hadoop Jobs:
+SSH into the master node.
+The Hadoop Jobs are:
+Job 1: Firefly Algorithm:
+Mapper: FireflyMapper
+Initializes a random population of fireflies (data points).
+
+Reducer: FireflyReducer
+Collects the results from the mapper. In this simplified implementation, it gives the fireflies as output
+
+Job 2: K-Means Clustering:
+Mapper: KMeansMapper
+Initializes random centroids for the clusters.
+Collects the results from the mapper. In this simplified implementation, it give the date points with their cluster centres as output.
+Reducer: KMeansReducer
+
+Run and Get the results:
+Check the output in the intermediate_output file.
+
+### Steps in running the code with 4-Nodes:
+#### Set Up AWS EMR Cluster:
+Create an EMR cluster with 4 nodes.
+
+Converting the Java code into .jar file:
+```
+hadoop jar FireflyKMeans.jar FireflyKMeans/KMeans_firefly/input bucket/intermediate_output
+```
+Upload Data and Code:
+Upload the Dataset
+Upload JAR file to intermediate_output.
+
+#### Run Hadoop Jobs:
+SSH into the master node.
+The Hadoop Jobs are:
+Job 1: Firefly Algorithm:
+Mapper: FireflyMapper
+Initializes a random population of fireflies (data points).
+
+Reducer: FireflyReducer
+Collects the results from the mapper. In this simplified implementation, it gives the fireflies as output
+
+Job 2: K-Means Clustering:
+Mapper: KMeansMapper
+Initializes random centroids for the clusters.
+Collects the results from the mapper. In this simplified implementation, it give the date points with their cluster centres as output.
+Reducer: KMeansReducer
+
+Run and Get the results:
+Check the output in the intermediate_output file.
